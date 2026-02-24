@@ -1,10 +1,14 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import dns from "node:dns/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, "../.env") });
+
+// Set DNS servers for MongoDB Atlas SRV resolution
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 import Product from "../src/modules/products/products.model.js";
 

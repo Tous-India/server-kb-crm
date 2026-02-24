@@ -158,9 +158,13 @@ export const create = catchAsync(async (req, res) => {
     throw new AppError("Part number and product name are required", 400);
   }
 
+  // Use defaults if category/brand are empty or not provided
+  const productCategory = category && category.trim() ? category : "Uncategorized";
+  const productBrand = brand && brand.trim() ? brand : "No Brand";
+
   const product = await Product.create({
-    part_number, oem_part, product_name, category, sub_category,
-    brand, description, list_price, your_price, discount_percentage,
+    part_number, oem_part, product_name, category: productCategory, sub_category,
+    brand: productBrand, description, list_price, your_price, discount_percentage,
     stock_status, available_locations, total_quantity,
     specifications, manufacturer,
   });
@@ -221,8 +225,8 @@ export const update = catchAsync(async (req, res) => {
 
   // Update other fields
   const fields = [
-    "part_number", "oem_part", "product_name", "category", "sub_category",
-    "brand", "description", "list_price", "your_price", "discount_percentage",
+    "part_number", "oem_part", "product_name", "sub_category",
+    "description", "list_price", "your_price", "discount_percentage",
     "stock_status", "available_locations", "total_quantity",
     "specifications", "manufacturer", "is_active",
   ];
@@ -232,6 +236,14 @@ export const update = catchAsync(async (req, res) => {
       product[field] = req.body[field];
     }
   });
+
+  // Handle category and brand with defaults for empty values
+  if (req.body.category !== undefined) {
+    product.category = req.body.category && req.body.category.trim() ? req.body.category : "Uncategorized";
+  }
+  if (req.body.brand !== undefined) {
+    product.brand = req.body.brand && req.body.brand.trim() ? req.body.brand : "No Brand";
+  }
 
   await product.save();
 
